@@ -4,8 +4,7 @@
     <description>Assistente JARVIS para Android</description>
     <author email="dev@stark.com" href="http://stark.com">Stark Industries</author>
 
-    <!-- Aponta diretamente para o Flask no Termux -->
-    <content src="http://127.0.0.1:5000" />
+    <content src="http://192.168.1.6:5000" />
 
     <access origin="*" />
     <allow-intent href="http://*/*" />
