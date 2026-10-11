@@ -15,19 +15,14 @@ jobs:
       - name: Setup Android SDK
         run: |
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+      - name: Install Gradle 8.7
+        run: |
+          wget -q https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          unzip -q gradle-8.7-bin.zip -d $HOME
+          echo "$HOME/gradle-8.7/bin" >> $GITHUB_PATH
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
-      - name: List wrapper files
-        run: find platforms/android -iname "gradle-wrapper*"
-      - name: Force Gradle version
-        run: |
-          WRAPPER=$(find platforms/android -iname "gradle-wrapper.properties")
-          if [ -n "$WRAPPER" ]; then
-            sed -i 's#distributionUrl=.*#distributionUrl=https\\://services.gradle.org/distributions/gradle-8.7-bin.zip#' "$WRAPPER"
-            cat "$WRAPPER"
-          else
-            echo "Wrapper nao encontrado, vai usar o padrao"
-          fi
+      - run: gradle --version
       - run: cordova build android --debug
       - uses: actions/upload-artifact@v4
         with:
