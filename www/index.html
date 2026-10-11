@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' http://192.168.1.6:5000; media-src *; img-src 'self' data: content:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data:; style-src 'self' 'unsafe-inline'; connect-src 'self' http://*:*; media-src *; img-src 'self' data: content:;">
     <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
     <link rel="stylesheet" href="css/index.css">
     <title>JARVIS</title>
@@ -22,6 +22,15 @@
     <div style="margin-top:30px;">
         <button id="btnMicrofone" style="padding:15px 30px; font-size:18px; background:#111; color:#0ff; border:2px solid #0ff;">🎤 Falar com JARVIS</button>
         <p id="voiceStatus" style="font-size:14px; color:#999;"></p>
+    </div>
+
+    <div style="margin-top:40px; border-top:1px solid #333; padding-top:20px;">
+        <p style="font-size:14px; color:#999;">Endereço do servidor JARVIS</p>
+        <input id="serverAddress" type="text" placeholder="http://192.168.1.6:5000" style="padding:10px; font-size:14px; width:70%;">
+        <br><br>
+        <button id="btnSalvarEndereco" style="padding:10px 20px; font-size:14px;">Salvar endereço</button>
+        <button id="btnTestarConexao" style="padding:10px 20px; font-size:14px;">Testar conexão</button>
+        <p id="connStatus" style="font-size:14px;"></p>
     </div>
 
     <script src="cordova.js"></script>

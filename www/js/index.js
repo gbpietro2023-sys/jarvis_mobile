@@ -1,6 +1,7 @@
 document.addEventListener('deviceready', onDeviceReady, false);
 
-var API_BASE = "http://192.168.1.6:5000";
+var DEFAULT_API_BASE = "http://192.168.1.6:5000";
+var API_BASE = localStorage.getItem('jarvis_api_base') || DEFAULT_API_BASE;
 
 function falar(texto) {
     if (window.TTS) {
@@ -14,6 +15,7 @@ function falar(texto) {
 
 function onDeviceReady() {
     document.getElementById('status').innerText = "JARVIS pronto.";
+    document.getElementById('serverAddress').value = API_BASE;
     falar("Sistemas on-line, senhor.");
     iniciarRastreamento();
     document.getElementById('btnOndeEstou').addEventListener('click', perguntarOndeEstou);
@@ -21,6 +23,44 @@ function onDeviceReady() {
         tracarRota(document.getElementById('destino').value);
     });
     document.getElementById('btnMicrofone').addEventListener('click', iniciarEscuta);
+    document.getElementById('btnSalvarEndereco').addEventListener('click', salvarEndereco);
+    document.getElementById('btnTestarConexao').addEventListener('click', testarConexao);
+}
+
+function salvarEndereco() {
+    var novoEndereco = document.getElementById('serverAddress').value.trim();
+    var connStatus = document.getElementById('connStatus');
+    if (!novoEndereco) {
+        connStatus.innerText = "Endereço não pode ficar vazio.";
+        connStatus.style.color = "#f55";
+        return;
+    }
+    if (novoEndereco.endsWith("/")) {
+        novoEndereco = novoEndereco.slice(0, -1);
+    }
+    API_BASE = novoEndereco;
+    localStorage.setItem('jarvis_api_base', API_BASE);
+    connStatus.innerText = "Endereço salvo: " + API_BASE;
+    connStatus.style.color = "#0f0";
+}
+
+function testarConexao() {
+    var connStatus = document.getElementById('connStatus');
+    connStatus.innerText = "Testando conexão...";
+    connStatus.style.color = "#999";
+    fetch(API_BASE + "/api/status", { method: "GET" })
+        .then(function(res) {
+            if (!res.ok) { throw new Error("Resposta inválida do servidor."); }
+            return res.json();
+        })
+        .then(function(data) {
+            connStatus.innerText = "Conectado com sucesso ao servidor.";
+            connStatus.style.color = "#0f0";
+        })
+        .catch(function(err) {
+            connStatus.innerText = "Falha ao conectar: servidor indisponível ou endereço incorreto.";
+            connStatus.style.color = "#f55";
+        });
 }
 
 function iniciarRastreamento() {
