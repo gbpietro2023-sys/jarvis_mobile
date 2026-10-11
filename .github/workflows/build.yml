@@ -23,6 +23,7 @@ jobs:
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
       - run: cordova plugin add cordova-plugin-geolocation
+      - run: cordova plugin add cordova-plugin-tts
       - run: cordova build android --debug
       - uses: actions/upload-artifact@v4
         with:

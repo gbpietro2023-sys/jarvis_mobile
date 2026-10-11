@@ -3,10 +3,13 @@ document.addEventListener('deviceready', onDeviceReady, false);
 var API_BASE = "http://192.168.1.6:5000";
 
 function falar(texto) {
-    if (!window.speechSynthesis) return;
-    var utter = new SpeechSynthesisUtterance(texto);
-    utter.lang = 'pt-BR';
-    speechSynthesis.speak(utter);
+    if (window.TTS) {
+        TTS.speak({ text: texto, locale: 'pt-BR', rate: 1.0 });
+    } else if (window.speechSynthesis) {
+        var utter = new SpeechSynthesisUtterance(texto);
+        utter.lang = 'pt-BR';
+        speechSynthesis.speak(utter);
+    }
 }
 
 function onDeviceReady() {
