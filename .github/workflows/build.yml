@@ -24,6 +24,7 @@ jobs:
       - run: cordova platform add android@12
       - run: cordova plugin add cordova-plugin-geolocation
       - run: cordova plugin add cordova-plugin-tts
+      - run: cordova plugin add cordova-plugin-inappbrowser
       - run: cordova build android --debug
       - uses: actions/upload-artifact@v4
         with:

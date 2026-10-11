@@ -54,6 +54,10 @@ function tracarRota() {
         return;
     }
     falar("Traçando rota para " + destino);
-    var url = "google.navigation:q=" + encodeURIComponent(destino) + "&mode=d";
-    window.open(url, "_system");
+    var url = "https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(destino) + "&travelmode=driving";
+    if (window.cordova && cordova.InAppBrowser) {
+        cordova.InAppBrowser.open(url, "_system");
+    } else {
+        window.open(url, "_system");
+    }
 }
