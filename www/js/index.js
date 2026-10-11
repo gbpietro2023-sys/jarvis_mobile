@@ -17,6 +17,7 @@ function onDeviceReady() {
     falar("Sistemas on-line, senhor.");
     iniciarRastreamento();
     document.getElementById('btnOndeEstou').addEventListener('click', perguntarOndeEstou);
+    document.getElementById('btnTracarRota').addEventListener('click', tracarRota);
 }
 
 function iniciarRastreamento() {
@@ -44,4 +45,15 @@ function perguntarOndeEstou() {
     }, function(err) {
         falar("Não consegui obter sua localização.");
     }, { enableHighAccuracy: true, timeout: 15000 });
+}
+
+function tracarRota() {
+    var destino = document.getElementById('destino').value;
+    if (!destino) {
+        falar("Por favor, digite um destino.");
+        return;
+    }
+    falar("Traçando rota para " + destino);
+    var url = "google.navigation:q=" + encodeURIComponent(destino) + "&mode=d";
+    window.open(url, "_system");
 }
