@@ -3,13 +3,17 @@
     <name>JARVIS</name>
     <description>Assistente JARVIS para Android</description>
     <author email="dev@stark.com" href="http://stark.com">Stark Industries</author>
-    
+
     <!-- Aponta diretamente para o Flask no Termux -->
     <content src="http://127.0.0.1:5000" />
-    
+
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="Fullscreen" value="true" />
-</widget>
+    <preference name="AndroidInsecureFileModeEnabled" value="true" />
 
+    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
+        <application android:usesCleartextTraffic="true" />
+    </edit-config>
+</widget>
