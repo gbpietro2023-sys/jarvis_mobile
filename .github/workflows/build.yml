@@ -14,7 +14,7 @@ jobs:
           node-version: 18
       - name: Setup Android SDK
         run: |
-          echo "y" | sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2" --sdk_root=$ANDROID_HOME
+          echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2"
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
       - run: cordova build android --debug
