@@ -17,7 +17,10 @@ function onDeviceReady() {
     falar("Sistemas on-line, senhor.");
     iniciarRastreamento();
     document.getElementById('btnOndeEstou').addEventListener('click', perguntarOndeEstou);
-    document.getElementById('btnTracarRota').addEventListener('click', tracarRota);
+    document.getElementById('btnTracarRota').addEventListener('click', function() {
+        tracarRota(document.getElementById('destino').value);
+    });
+    document.getElementById('btnMicrofone').addEventListener('click', iniciarEscuta);
 }
 
 function iniciarRastreamento() {
@@ -47,10 +50,9 @@ function perguntarOndeEstou() {
     }, { enableHighAccuracy: true, timeout: 15000 });
 }
 
-function tracarRota() {
-    var destino = document.getElementById('destino').value;
+function tracarRota(destino) {
     if (!destino) {
-        falar("Por favor, digite um destino.");
+        falar("Por favor, diga ou digite um destino.");
         return;
     }
     falar("Traçando rota para " + destino);
@@ -59,5 +61,75 @@ function tracarRota() {
         cordova.InAppBrowser.open(url, "_system");
     } else {
         window.open(url, "_system");
+    }
+}
+
+// ---- Reconhecimento de voz ----
+
+function iniciarEscuta() {
+    var voiceStatus = document.getElementById('voiceStatus');
+
+    if (!window.plugins || !window.plugins.speechRecognition) {
+        voiceStatus.innerText = "Reconhecimento de voz não disponível neste dispositivo.";
+        falar("Reconhecimento de voz não está disponível.");
+        return;
+    }
+
+    var speech = window.plugins.speechRecognition;
+
+    speech.hasPermission(function(hasPermission) {
+        if (hasPermission) {
+            escutar();
+        } else {
+            speech.requestPermission(function() {
+                escutar();
+            }, function() {
+                voiceStatus.innerText = "Permissão de microfone negada.";
+                falar("Preciso de permissão para usar o microfone.");
+            });
+        }
+    }, function() {
+        voiceStatus.innerText = "Erro ao verificar permissão do microfone.";
+    });
+
+    function escutar() {
+        voiceStatus.innerText = "🎤 Ouvindo... fale agora.";
+        speech.startListening(function(matches) {
+            voiceStatus.innerText = "Processando comando...";
+            if (matches && matches.length > 0) {
+                processarComando(matches[0]);
+            } else {
+                voiceStatus.innerText = "Não entendi, tente novamente.";
+                falar("Não entendi o comando.");
+            }
+        }, function(error) {
+            voiceStatus.innerText = "Erro na captura de voz.";
+            falar("Houve um erro ao tentar escutar.");
+        }, {
+            language: "pt-BR",
+            matches: 1,
+            showPopup: false
+        });
+    }
+}
+
+function processarComando(texto) {
+    var voiceStatus = document.getElementById('voiceStatus');
+    var comando = texto.toLowerCase();
+    voiceStatus.innerText = 'Comando reconhecido: "' + texto + '"';
+
+    if (comando.indexOf("onde") !== -1) {
+        perguntarOndeEstou();
+    } else if (comando.indexOf("rota") !== -1 || comando.indexOf("traçar") !== -1 || comando.indexOf("tracar") !== -1) {
+        var destino = texto;
+        var marcador = comando.indexOf(" para ");
+        if (marcador !== -1) {
+            destino = texto.substring(marcador + 6);
+        }
+        document.getElementById('destino').value = destino;
+        tracarRota(destino);
+    } else {
+        falar("Comando não reconhecido. Diga onde eu estou, ou traçar rota para um destino.");
+        voiceStatus.innerText = "Comando não reconhecido.";
     }
 }
