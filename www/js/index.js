@@ -1,29 +1,44 @@
-/**
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
-*/
-
-// Wait for the deviceready event before using any of Cordova's device APIs.
-// See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
 document.addEventListener('deviceready', onDeviceReady, false);
 
-function onDeviceReady() {
-    // Cordova is now initialized. Have fun!
+var API_BASE = "http://192.168.1.6:5000";
 
-    console.log('Running cordova-' + cordova.platformId + '@' + cordova.version);
-    document.getElementById('deviceready').classList.add('ready');
+function falar(texto) {
+    if (!window.speechSynthesis) return;
+    var utter = new SpeechSynthesisUtterance(texto);
+    utter.lang = 'pt-BR';
+    speechSynthesis.speak(utter);
+}
+
+function onDeviceReady() {
+    document.getElementById('status').innerText = "JARVIS pronto.";
+    falar("Sistemas on-line, senhor.");
+    iniciarRastreamento();
+    document.getElementById('btnOndeEstou').addEventListener('click', perguntarOndeEstou);
+}
+
+function iniciarRastreamento() {
+    navigator.geolocation.watchPosition(function(pos) {
+        document.getElementById('coords').innerText =
+            "Lat: " + pos.coords.latitude.toFixed(5) + ", Lon: " + pos.coords.longitude.toFixed(5);
+    }, function(err) {
+        document.getElementById('status').innerText = "Erro de localização: " + err.message;
+    }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 5000 });
+}
+
+function perguntarOndeEstou() {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+        var lat = pos.coords.latitude;
+        var lon = pos.coords.longitude;
+        fetch(API_BASE + "/api/onde_estou?lat=" + lat + "&lon=" + lon)
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                document.getElementById('status').innerText = data.endereco;
+                falar("Senhor, você está em " + data.endereco);
+            })
+            .catch(function() {
+                falar("Não consegui me conectar ao backend.");
+            });
+    }, function(err) {
+        falar("Não consegui obter sua localização.");
+    }, { enableHighAccuracy: true, timeout: 15000 });
 }

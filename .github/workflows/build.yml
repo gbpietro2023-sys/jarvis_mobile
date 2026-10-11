@@ -22,7 +22,7 @@ jobs:
           echo "$HOME/gradle-8.7/bin" >> $GITHUB_PATH
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
-      - run: gradle --version
+      - run: cordova plugin add cordova-plugin-geolocation
       - run: cordova build android --debug
       - uses: actions/upload-artifact@v4
         with:

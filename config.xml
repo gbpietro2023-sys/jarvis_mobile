@@ -4,13 +4,15 @@
     <description>Assistente JARVIS para Android</description>
     <author email="dev@stark.com" href="http://stark.com">Stark Industries</author>
 
-    <content src="http://192.168.1.6:5000" />
+    <content src="index.html" />
 
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <preference name="Fullscreen" value="true" />
     <preference name="AndroidInsecureFileModeEnabled" value="true" />
+
+    <plugin name="cordova-plugin-geolocation" spec="^5.0.0" />
 
     <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application" xmlns:android="http://schemas.android.com/apk/res/android">
         <application android:usesCleartextTraffic="true" />
