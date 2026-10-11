@@ -12,7 +12,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - uses: android-actions/setup-android@v3
+      - name: Setup Android SDK
+        run: |
+          echo "y" | sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2" --sdk_root=$ANDROID_HOME
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
       - run: cordova build android --debug
