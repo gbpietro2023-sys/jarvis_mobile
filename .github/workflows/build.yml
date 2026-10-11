@@ -17,6 +17,10 @@ jobs:
           echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platform-tools" "platforms;android-33" "build-tools;33.0.2"
       - run: npm install -g cordova@12
       - run: cordova platform add android@12
+      - name: Force Gradle version
+        run: |
+          cd platforms/android
+          sed -i 's#distributionUrl=.*#distributionUrl=https\\://services.gradle.org/distributions/gradle-8.7-bin.zip#' gradle/wrapper/gradle-wrapper.properties
       - run: cordova build android --debug
       - uses: actions/upload-artifact@v4
         with:
