@@ -36,7 +36,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
-          cordova build android --release -- \
+          cordova build android --release --packageType=apk -- \
             --keystore="$(pwd)/release.keystore" \
             --storePassword="$KEYSTORE_PASSWORD" \
             --alias="$KEY_ALIAS" \
