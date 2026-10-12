@@ -2,6 +2,7 @@ document.addEventListener('deviceready', onDeviceReady, false);
 
 var DEFAULT_API_BASE = "http://192.168.1.6:5000";
 var API_BASE = localStorage.getItem('jarvis_api_base') || DEFAULT_API_BASE;
+var escutaEmAndamento = false;
 
 function falar(texto) {
     if (window.TTS) {
@@ -106,14 +107,35 @@ function tracarRota(destino) {
 
 // ---- Reconhecimento de voz ----
 
+function definirEstadoBotaoMicrofone(ativo) {
+    var btn = document.getElementById('btnMicrofone');
+    btn.disabled = ativo;
+    btn.style.opacity = ativo ? "0.5" : "1";
+}
+
+function encerrarEscuta() {
+    escutaEmAndamento = false;
+    definirEstadoBotaoMicrofone(false);
+}
+
 function iniciarEscuta() {
     var voiceStatus = document.getElementById('voiceStatus');
+
+    // Protecao contra captura simultanea: ignora toques enquanto ja
+    // existe uma escuta em andamento (botao tambem fica desabilitado
+    // visualmente, mas esta checagem e a garantia logica real).
+    if (escutaEmAndamento) {
+        return;
+    }
 
     if (!window.plugins || !window.plugins.speechRecognition) {
         voiceStatus.innerText = "Reconhecimento de voz não disponível neste dispositivo.";
         falar("Reconhecimento de voz não está disponível.");
         return;
     }
+
+    escutaEmAndamento = true;
+    definirEstadoBotaoMicrofone(true);
 
     var speech = window.plugins.speechRecognition;
 
@@ -126,10 +148,13 @@ function iniciarEscuta() {
             }, function() {
                 voiceStatus.innerText = "Permissão de microfone negada.";
                 falar("Preciso de permissão para usar o microfone.");
+                encerrarEscuta();
             });
         }
     }, function() {
         voiceStatus.innerText = "Erro ao verificar permissão do microfone.";
+        falar("Não consegui verificar a permissão do microfone.");
+        encerrarEscuta();
     });
 
     function escutar() {
@@ -142,9 +167,16 @@ function iniciarEscuta() {
                 voiceStatus.innerText = "Não entendi, tente novamente.";
                 falar("Não entendi o comando.");
             }
+            encerrarEscuta();
         }, function(error) {
-            voiceStatus.innerText = "Erro na captura de voz.";
+            // O plugin nativo nao garante um codigo de erro detalhado e
+            // consistente entre fabricantes de Android, por isso usamos
+            // uma mensagem generica para qualquer falha de captura
+            // (inclui timeout de silencio, sem rede quando o motor
+            // online e usado, ou falha interna do reconhecedor).
+            voiceStatus.innerText = "Erro na captura de voz. Tente novamente.";
             falar("Houve um erro ao tentar escutar.");
+            encerrarEscuta();
         }, {
             language: "pt-BR",
             matches: 1,
