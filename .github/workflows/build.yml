@@ -26,8 +26,29 @@ jobs:
       - run: cordova plugin add cordova-plugin-tts
       - run: cordova plugin add cordova-plugin-inappbrowser
       - run: cordova plugin add cordova-plugin-speechrecognition
-      - run: cordova build android --debug
+      - name: Build debug APK
+        run: cordova build android --debug
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+      - name: Build release APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cordova build android --release -- \
+            --keystore="$(pwd)/release.keystore" \
+            --storePassword="$KEYSTORE_PASSWORD" \
+            --alias="$KEY_ALIAS" \
+            --password="$KEY_PASSWORD"
+      - name: Remove keystore
+        if: always()
+        run: rm -f release.keystore
       - uses: actions/upload-artifact@v4
         with:
-          name: jarvis-apk
+          name: jarvis-apk-debug
           path: platforms/android/app/build/outputs/apk/debug/*.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jarvis-apk-release
+          path: platforms/android/app/build/outputs/apk/release/*.apk
