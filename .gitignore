@@ -4,3 +4,4 @@ node_modules/
 gradle-8.8/
 gradle-8.5/
 *.zip
+backups/
