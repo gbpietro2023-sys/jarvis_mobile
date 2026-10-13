@@ -5,3 +5,7 @@ gradle-8.8/
 gradle-8.5/
 *.zip
 backups/
+
+# Arquivos locais de execucao e backups
+flask_boot.log
+www/js/*.backup*

@@ -47,19 +47,45 @@ function salvarEndereco() {
 
 function testarConexao() {
     var connStatus = document.getElementById('connStatus');
+    var controller = new AbortController();
+    var terminou = false;
+
     connStatus.innerText = "Testando conexão...";
     connStatus.style.color = "#999";
-    fetch(API_BASE + "/api/status", { method: "GET" })
+
+    var timeout = setTimeout(function() {
+        terminou = true;
+        controller.abort();
+        connStatus.innerText = "Tempo esgotado ao conectar. Verifique o servidor e a rede.";
+        connStatus.style.color = "#f55";
+    }, 8000);
+
+    fetch(API_BASE + "/api/status", {
+        method: "GET",
+        signal: controller.signal
+    })
         .then(function(res) {
-            if (!res.ok) { throw new Error("Resposta inválida do servidor."); }
+            if (!res.ok) {
+                throw new Error("Resposta inválida do servidor.");
+            }
             return res.json();
         })
         .then(function(data) {
-            connStatus.innerText = "Conectado com sucesso ao servidor.";
-            connStatus.style.color = "#0f0";
+            if (terminou) return;
+            clearTimeout(timeout);
+
+            if (data && data.status === "online") {
+                connStatus.innerText = "Conectado com sucesso ao servidor.";
+                connStatus.style.color = "#0f0";
+            } else {
+                connStatus.innerText = "Servidor respondeu, mas o status é inesperado.";
+                connStatus.style.color = "#f55";
+            }
         })
         .catch(function(err) {
-            connStatus.innerText = "Falha ao conectar: servidor indisponível ou endereço incorreto.";
+            if (terminou) return;
+            clearTimeout(timeout);
+            connStatus.innerText = "Falha ao conectar: verifique o servidor e o endereço.";
             connStatus.style.color = "#f55";
         });
 }
