@@ -26,6 +26,11 @@ function onDeviceReady() {
     document.getElementById('btnMicrofone').addEventListener('click', iniciarEscuta);
     document.getElementById('btnSalvarEndereco').addEventListener('click', salvarEndereco);
     document.getElementById('btnTestarConexao').addEventListener('click', testarConexao);
+    document.getElementById('btnSentinelaAtivar').addEventListener('click', ativarSentinela);
+    document.getElementById('btnSentinelaPausar').addEventListener('click', pausarSentinela);
+    document.getElementById('btnSentinelaRetomar').addEventListener('click', retomarSentinela);
+    document.getElementById('btnSentinelaEncerrar').addEventListener('click', encerrarSentinela);
+    atualizarInterfaceSentinela();
 }
 
 function salvarEndereco() {
@@ -230,4 +235,52 @@ function processarComando(texto) {
         falar("Comando não reconhecido. Diga onde eu estou, ou traçar rota para um destino.");
         voiceStatus.innerText = "Comando não reconhecido.";
     }
+}
+
+// MODO SENTINELA — ETAPA 1: estado manual, sem captura de áudio.
+var estadoSentinela = "inativo";
+
+function atualizarInterfaceSentinela() {
+    var status = document.getElementById("sentinelaStatus");
+    var ativar = document.getElementById("btnSentinelaAtivar");
+    var pausar = document.getElementById("btnSentinelaPausar");
+    var retomar = document.getElementById("btnSentinelaRetomar");
+    var encerrar = document.getElementById("btnSentinelaEncerrar");
+    if (!status || !ativar || !pausar || !retomar || !encerrar) return;
+
+    var mensagens = {
+        inativo: "Estado: Inativo",
+        ativo: "Estado: Ativo — controle manual; monitoramento ainda não implementado",
+        pausado: "Estado: Pausado",
+        encerrado: "Estado: Encerrado"
+    };
+    status.textContent = mensagens[estadoSentinela];
+    status.style.color = estadoSentinela === "ativo" ? "#00ff88" : "#0ff";
+    ativar.disabled = estadoSentinela === "ativo" || estadoSentinela === "pausado";
+    pausar.disabled = estadoSentinela !== "ativo";
+    retomar.disabled = estadoSentinela !== "pausado";
+    encerrar.disabled = estadoSentinela === "inativo" || estadoSentinela === "encerrado";
+}
+
+function ativarSentinela() {
+    if (estadoSentinela === "inativo" || estadoSentinela === "encerrado") {
+        estadoSentinela = "ativo";
+        atualizarInterfaceSentinela();
+    }
+}
+function pausarSentinela() {
+    if (estadoSentinela === "ativo") {
+        estadoSentinela = "pausado";
+        atualizarInterfaceSentinela();
+    }
+}
+function retomarSentinela() {
+    if (estadoSentinela === "pausado") {
+        estadoSentinela = "ativo";
+        atualizarInterfaceSentinela();
+    }
+}
+function encerrarSentinela() {
+    estadoSentinela = "encerrado";
+    atualizarInterfaceSentinela();
 }

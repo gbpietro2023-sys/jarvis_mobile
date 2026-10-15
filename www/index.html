@@ -24,6 +24,16 @@
         <p id="voiceStatus" style="font-size:14px; color:#999;"></p>
     </div>
 
+    <section id="painelSentinela" style="margin:30px 12px; padding:18px; border:1px solid #0ff; border-radius:12px;">
+        <h2 style="margin-top:0;">Modo Sentinela</h2>
+        <p id="sentinelaStatus" role="status" aria-live="polite">Estado: Inativo</p>
+        <p style="font-size:13px; color:#aaa;">Etapa 1 — controle manual. Sem monitoramento ou captura de áudio nesta etapa.</p>
+        <button id="btnSentinelaAtivar" style="padding:10px; margin:4px;">Ativar</button>
+        <button id="btnSentinelaPausar" style="padding:10px; margin:4px;" disabled>Pausar</button>
+        <button id="btnSentinelaRetomar" style="padding:10px; margin:4px;" disabled>Retomar</button>
+        <button id="btnSentinelaEncerrar" style="padding:10px; margin:4px;" disabled>Encerrar</button>
+    </section>
+
     <div style="margin-top:40px; border-top:1px solid #333; padding-top:20px;">
         <p style="font-size:14px; color:#999;">Endereço do servidor JARVIS</p>
         <input id="serverAddress" type="text" placeholder="http://192.168.1.6:5000" style="padding:10px; font-size:14px; width:70%;">
